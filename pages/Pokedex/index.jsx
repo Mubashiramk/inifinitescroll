@@ -14,24 +14,45 @@ const fetchPokedex = async (page) => {
 
 const Pokedex = () => {
   const [page, setPage] = useState(0);
-  const { data, status } = useQuery(
-    ["pokedex", page],
-    () => fetchPokedex(page),
-    {
-      keepPreviousData: true,
-    }
-  );
+  const {
+    isLoading,
+    isError,
+    isSuccess,
+    error,
+    data,
+    isFetching,
+    isPreviousData,
+  } = useQuery(["pokedex", page], () => fetchPokedex(page), {
+    keepPreviousData: true,
+  });
 
   return (
     <div className={classes.main}>
       <h3 className={classes.h3}>Pokedex</h3>
-      {status === "loading" && <div>Loading Data...</div>}
-      {status === "error" && <div>Error fetching Data</div>}
-      {status === "success" && (
+      <div>{isFetching ? "Fetching..." : null}</div>
+
+      {isLoading === "loading" && <div>Loading Data...</div>}
+      {isError === "error" && <div>Error fetching Data</div>}
+      {data && (
         <>
           {/* <button onClick={() => setPage(0)}> page1</button>
           <button onClick={() => setPage(20)}> page2</button>
           <button onClick={() => setPage(40)}> page3</button> */}
+
+          <div className="nav btn-container">
+            <button
+              onClick={() =>
+                setPage((prevState) => Math.max(prevState - 20, 0))
+              }
+              disabled={page === 1}
+            >
+              Prev Page
+            </button>
+
+            <button onClick={() => setPage((prevState) => prevState + 20)}>
+              Next Page
+            </button>
+          </div>
 
           <div className={classes.body}>
             {data.results.map((post, index) => (
